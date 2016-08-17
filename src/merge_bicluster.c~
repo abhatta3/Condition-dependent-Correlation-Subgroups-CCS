@@ -1,0 +1,25 @@
+#include "../include/ccs.h"
+
+
+void mergebcl(struct bicl *bicluster, int new,int old,int n,int D,double score)
+{
+  int i;
+
+  for (i = 0; i < n; i++) {
+      		if (bicluster[old].data[i]=='1' && bicluster[new].data[i]=='0') {
+                    bicluster[new].data[i]='1';
+                    bicluster[new].datacount+=1;
+                }
+  }
+
+  for (i = 0; i < D; i++) {
+      		if (bicluster[old].sample[i]=='1' &&  bicluster[new].sample[i]=='0') {
+                    bicluster[new].sample[i]='1';
+                    bicluster[new].samplecount+=1;
+                 }
+  } 
+
+  bicluster[old].score=1.0; //Delete the merged bicluster
+  bicluster[new].score=score; //update merged bicluster score 
+}
+
