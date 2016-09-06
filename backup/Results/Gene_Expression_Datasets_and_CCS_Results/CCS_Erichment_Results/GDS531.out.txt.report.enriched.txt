@@ -1,0 +1,3 @@
+Bicluster1	2457
+Bicluster2	60
+Bicluster3	93

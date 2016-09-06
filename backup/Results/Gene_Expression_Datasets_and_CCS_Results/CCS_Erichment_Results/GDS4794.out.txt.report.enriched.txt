@@ -1,0 +1,9 @@
+Bicluster1	2306
+Bicluster2	651
+Bicluster3	5
+Bicluster4	1
+Bicluster5	19
+Bicluster6	18
+Bicluster7	4
+Bicluster8	1
+Bicluster9	2

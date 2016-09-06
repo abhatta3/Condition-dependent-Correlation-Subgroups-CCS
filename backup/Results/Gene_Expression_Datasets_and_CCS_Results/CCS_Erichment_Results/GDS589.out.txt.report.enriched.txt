@@ -1,0 +1,10 @@
+Bicluster1	307
+Bicluster2	352
+Bicluster3	8
+Bicluster4	25
+Bicluster5	16
+Bicluster6	107
+Bicluster7	259
+Bicluster8	24
+Bicluster9	4
+Bicluster10	2
