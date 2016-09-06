@@ -1,4 +1,5 @@
-
+#include<stdio.h>
+#include <stdlib.h>
 
 void getmatrixsize(FILE *in,int *nn,int *DD)
 {
@@ -17,8 +18,7 @@ void getmatrixsize(FILE *in,int *nn,int *DD)
   		n++;
    }  
 
-   //n--;
-   
+
    free(line);
       
    *nn=n;

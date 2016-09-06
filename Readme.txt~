@@ -65,7 +65,7 @@ D. Execute CUDA C code
 
 Type following in the linux commandprompt
 
-	./ccs_cuda -t [correlation threshold] -i [input file] -o [output file] -m [number_of_base_gene]
+	$./ccs_cuda -t [correlation threshold] -i [input file] -o [output file] -m [number_of_base_gene]
 
 Example
 	$./ccs_cuda -t 0.8 -i ../Data/Data_Constant_100_1_bicluster.txt -o ./Output.txt

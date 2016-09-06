@@ -1,16 +1,20 @@
-#include "ccs_cu.h"
+#include "../include/ccs.h"
 
 
-void readgene(char * infile, struct cgn *gene,char **Hd, int n,int D)
+void readgene(char * infile, struct gn *gene,char **Hd, int n,int D)
 {
-	FILE *in;
-	int    i,j,l;
-	float tr,average;
-	char *line;
+	FILE *in,*out;
+	int    i,j,l,tindx;
+	double maxr,tr,average;
+	char *line=NULL;
 
-	line=(char *)malloc(100000*sizeof(char));
+	line=(char *)malloc(BUFFER_MAXSIZE*sizeof(char));
+        if (!line)
+  	    exit(-1);
 
 	in = fopen(infile,"r");
+        //out= fopen("sorteddatamatrix.txt","w");
+
   
 	for (j = 0; j < D+1; j++)   {   
 		fscanf(in,"%s",line);
@@ -20,10 +24,13 @@ void readgene(char * infile, struct cgn *gene,char **Hd, int n,int D)
 
 	
 	for (i = 0; i < n; i++)	{ 
-		fscanf(in,"%s",gene[i].id);
+		fscanf(in,"%s",line);
+  		gene[i].id=(char *)calloc(strlen(line),sizeof(char));	
+		strcpy(gene[i].id,line);
+                gene[i].indx=i;
 		average=0;
 		for (j = 0; j < D; j++)	{
-			fscanf(in,"%f",&gene[i].x[j]);
+			fscanf(in,"%lf",&gene[i].x[j]);
 			average+=gene[i].x[j];   
 		}
 		gene[i].x[D]=average/D;
@@ -34,12 +41,16 @@ void readgene(char * infile, struct cgn *gene,char **Hd, int n,int D)
 	}
 
 
+
 	for (i = 0; i < n-1; i++)	{  
 		for (j = i+1; j < n; j++) {
 			if(gene[i].x[D+1]<gene[j].x[D+1]) {
 				strcpy(line,gene[j].id);
 				strcpy(gene[j].id,gene[i].id);
 				strcpy(gene[i].id,line);
+                                tindx=gene[j].indx;
+                                gene[j].indx=gene[i].indx;
+                                gene[i].indx=tindx;
 
 				for (l = 0; l < D+2; l++) {  
 					tr=gene[i].x[l];
@@ -49,6 +60,7 @@ void readgene(char * infile, struct cgn *gene,char **Hd, int n,int D)
 			}
 		}
 	}
+
 
 
 

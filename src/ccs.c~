@@ -15,7 +15,7 @@ respectively.
 ****************************************************************************
 */
 
-#include "../include/ccs.h"
+#include "./include/ccs.h"
 
 int main(int argc, char *argv[])
 {
