@@ -4,15 +4,8 @@
 ###                                                                                              ###
 ### This file is part of the CCS package for biclustering analysis                               ###
 ###                                                                                              ###
-### Copyright (c) 2016 by:                                                                       ###
-###   * Anindya Bhattacharya,                                                                    ###
-###   * Yan Cui                                                                                  ###
-###                                                                                              ###
 ###----------------------------------------------------------------------------------------------###
-###                                                                                              ###
-### This package is free for academic research                                                   ###
-###                                                                                              ###
-###----------------------------------------------------------------------------------------------###
+
 
 =======================
 Introduction to CCS
@@ -31,7 +24,7 @@ The most important features of CCS are :
 (vi) merging the overlapping biclusters based on condition dependency and overlap and 
 (vii) considering both negative and positive correlation in the same bicluster. 
 
-The algorithm is implemented in C and freely available as a part of this software package. See the Steps in A and B for compilation and execution of the C code.
+The algorithm is implemented in C. See the Steps in A and B for compilation and execution of the C code.
 
 The structure of the CCS algorithm is particularly suitable for parallel computing. A CUDA C based GPGPU computing code is included here as a parallel version of the algorithm. 
 You need a programmable GPU card and CUDA C complier for compilation and execution of our code. Follow the steps in C and D.
@@ -43,20 +36,6 @@ Synthetic datasets, CCS results and true biclusters are available in "Data" dire
  
 CCS biclustering results on gene expression datasets and the datasets are available from "Results" directory.
 
-
--------
-Authors
--------
-
-* Anindya Bhattacharya, <anindyamail123@gmail.com>
-* Yan Cui, <ycui2@uthsc.edu>
-
--------
-Contact
--------
-
-If you have comments or questions, or if you would like to contribute
-to the improvement of CCS, please send us an email at anindyamail123@gmail.com and ycui2@uthsc.edu
 
 
 ============================
@@ -139,4 +118,25 @@ Example
 	$./ccs_cuda -t 0.8 -i ../Data/Data_Constant_100_1_bicluster.txt -o ./Output.txt -m 50
 
 
+
+
+====================================
+Authors
+====================================
+
+* Anindya Bhattacharya, <anindyamail123@gmail.com>
+* Yan Cui, <ycui2@uthsc.edu>
+
+====================================
+Contact
+====================================
+
+If you have comments or questions, or if you would like to contribute
+to the improvement of CCS, please send us an email at anindyamail123@gmail.com and ycui2@uthsc.edu
+
+====================================
+License
+====================================
+
+This projected is licensed under the terms of the GNU General Public License v3.0.
 
