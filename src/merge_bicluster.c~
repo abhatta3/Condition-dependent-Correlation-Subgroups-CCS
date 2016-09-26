@@ -1,4 +1,4 @@
-#include "ccs.h"
+#include "../include/ccs.h"
 
 
 void mergebcl(struct bicl *bicluster, int nw,int old,int n,int D,double score)

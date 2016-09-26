@@ -1,0 +1,86 @@
+#include<stdio.h>
+#include<math.h>
+#include<time.h>
+int main()
+{
+	float r,xx[12],xy[12],yy[12],nr=0,dr_1=0,dr_2=0,dr_3=0,dr=0;
+	float x[12]={9,5,3,2,1,0,0,1,2,3,5,9},y[12]={9,5,3,2,1,0,9,5,3,2,1,0};
+	float sum_y=0,sum_yy=0,sum_xy=0,sum_x=0,sum_xx=0;
+	int i,n=12;
+ 	double elapsed_time;
+        clock_t start,end;
+        start = clock() ;
+
+	for(i=0;i<n;i++)
+	{
+		 xx[i]=x[i]*x[i];
+		 yy[i]=y[i]*y[i];
+
+		 sum_x+=x[i];
+		 sum_y+=y[i];
+		 sum_xx+= xx[i];
+		 sum_yy+=yy[i];
+		 sum_xy+= x[i]*y[i];     
+	}
+	nr=(n*sum_xy)-(sum_x*sum_y);
+	float sum_x2=sum_x*sum_x;
+	float sum_y2=sum_y*sum_y;
+	dr_1=(n*sum_xx)-sum_x2;
+	dr_2=(n*sum_yy)-sum_y2;
+	dr_3=dr_1*dr_2;
+	dr=sqrt(dr_3);
+	r=(nr/dr);
+ 	end = clock();
+ 	elapsed_time = (end-start)/(double)CLOCKS_PER_SEC ;
+ 	
+
+	printf("Total Numbers:%d\nCorrelation Coefficient:%.2f Ellapsed time=%lf\n",n,r,elapsed_time);
+
+
+
+	double sx = 0;
+	double sxx = 0;
+
+	
+	double sy = 0;
+	double sxy = 0;
+	double syy = 0;
+        double nr=0;
+        int j;
+
+ 	start = clock();
+
+	for (j = 0; j < n; j++) {
+ 			sx +=  x[j];
+  	}
+        sx /= n;
+	for (j = 0; j < n; j++) {
+ 			sxx += (sx-x[j]) * (sx-x[j]);
+	}
+	sxx = (double)sqrt(sxx);
+
+	for (j = 0; j < n; j++) {
+ 			sy +=  y[j];
+	}
+	sy /= n; 
+
+	for (j = 0; j < n; j++)
+	{
+
+			sxy += (sx - x[j]) * (sy - y[j]);
+			syy += (sy - y[j]) * (sy - y[j]);
+	}
+
+	syy = (double)sqrt(syy);
+
+	nr = sxy/(sxx * syy);
+
+ 	end = clock();
+ 	elapsed_time = (end-start)/(double)CLOCKS_PER_SEC ;
+ 	
+
+	printf("Total Numbers:%d\nCorrelation Coefficient:%.2f Ellapsed time=%lf\n",n,nr,elapsed_time);
+
+
+	return 0;   
+}

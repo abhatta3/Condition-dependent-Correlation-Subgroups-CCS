@@ -15,7 +15,6 @@
 #define FALSE                    0
 #define FAIL                    -1
 
-
 #define mingene 10    //minimum number of genes in a bicluster 
 #define min 10        //minimum number of samples in a bicluster
 #define MAXB 1000     //default number of base gene (outer loop) in the decreasing order of SD to consider for forming the biclusters. Overide if -m number>1000 is used 
@@ -37,10 +36,14 @@ struct bicl{
 };
 
 
+struct pair_r{
+double r,n_r;
+};
+
 void printUsage();
 void getmatrixsize(FILE *,int *,int *);
 void readgene(char *,struct gn *,char **,int,int);
-void computebicluster(struct gn *,int,int,double,int,struct bicl *);
+void computebicluster(struct gn *,int,int,double,int,struct bicl *,struct bicl,char **);
 void printbicluster(FILE *,struct gn *,char **,int,int,int,double,struct bicl *,int);
 double between_bicluster_correlation(struct gn *,struct bicl *, int,int,int,int,double);
 void mergebcl(struct bicl *, int,int,int,int,double);

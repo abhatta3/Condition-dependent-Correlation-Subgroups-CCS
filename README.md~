@@ -76,9 +76,7 @@ Additional parameters:
 -m [1 - number of gene/rows in the data matrix]: Set the number of base gene that are to be considered for forming biclusters. 
  						 Default value is 1000 or maximum number of genes when that is less than 1000. 
 
-Example: 
-
-$./ccsbc -t 0.8 -i ./Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.txt -m 50
+Example: $./ccsbc -t 0.8 -i ./Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.txt -m 50
 
 
 -p [0/1]: Set the output format.
@@ -93,13 +91,9 @@ $./ccsbc -t 0.8 -i ./Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.
 		Row 2: Column_index_1[b]Column_index_2[b] ...     
 
 
-Example: 
+Example: $./ccsbc -t 0.8 -i ./Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./TempResults/Output.txt -m 50 -p 1
 
-1. $./ccsbc -t 0.8 -i ./Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./TempResults/Output_standard.txt -m 50 -p 0
 
-2. $./ccsbc -t 0.8 -i ./Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./TempResults/Output_bibench.txt -m 50 -p 1
-
-See your results at "TempResults"
 
 
 C. Compilation of CUDA C code
@@ -120,9 +114,9 @@ Type following in the linux commandprompt
 	./ccs_cuda -t [correlation threshold] -i [input file] -o [output file] -m [number_of_base_gene]
 
 Example
-	$./ccs_cuda -t 0.8 -i ../Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Output.txt
+	$./ccs_cuda -t 0.8 -i ../Data/Data_Constant_100_1_bicluster.txt -o ./Output.txt
 
-	$./ccs_cuda -t 0.8 -i ../Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Output.txt -m 50
+	$./ccs_cuda -t 0.8 -i ../Data/Data_Constant_100_1_bicluster.txt -o ./Output.txt -m 50
 
 
 

@@ -1,6 +1,0 @@
-50	51	0.000000
-row67 row92 row88 row99 row0 row41 row58 row39 row14 row45 row42 row8 row80 row10 row54 row78 row71 row48 row95 row31 row25 row12 row52 row27 row55 row93 row46 row20 row91 row19 row26 row35 row75 row61 row22 row43 row4 row84 row49 row83 row2 row17 row87 row37 row90 row72 row68 row74 row7 row85 
-col0 col1 col2 col5 col10 col12 col16 col18 col19 col21 col22 col24 col26 col29 col30 col31 col32 col36 col37 col41 col45 col46 col47 col49 col50 col52 col53 col54 col55 col56 col57 col60 col63 col64 col69 col70 col72 col74 col79 col80 col81 col82 col86 col88 col90 col91 col93 col95 col97 col98 col99 
-
-
-Ellapsed time=0.628948

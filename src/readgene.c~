@@ -7,7 +7,7 @@ void readgene(char * infile, struct gn *gene,char **Hd, int n,int D)
 	int    i,j,l,tindx;
 	double maxr,tr,average,*varn;
 	char *line=NULL;
-        varn=(double *)calloc(n,sizeof(double)); 
+        varn=(double *)caloc(n,sizeof(double)); 
 
 	line=(char *)malloc(BUFFER_MAXSIZE*sizeof(char));
         if (!line)
