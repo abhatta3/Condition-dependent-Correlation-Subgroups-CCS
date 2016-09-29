@@ -8,6 +8,8 @@ float between_bicluster_correlation(struct cgn *gene,struct cbicl *bicluster, in
  char *g,*x;
  int tc[2],dif,un,overlap=0;
 
+ int total=0,mintotal=0;
+
 
   for (i=0;i<n;i++) {
       if (bicluster[nw].data[i]=='1' && bicluster[old].data[i]=='1') {
@@ -90,8 +92,8 @@ float between_bicluster_correlation(struct cgn *gene,struct cbicl *bicluster, in
 			sxx[1] += (sx[1]-gene[i].x[j]) * (sx[1]-gene[i].x[j]);
                    } 
 	      }
-	      sxx[0] = (float)sqrt(sxx[0]);
-	      sxx[1] = (float)sqrt(sxx[1]);
+	      sxx[0] = sqrt(sxx[0]);
+	      sxx[1] = sqrt(sxx[1]);
 
 	      for(l=i+1;l<n;l++) {
 
@@ -138,9 +140,9 @@ float between_bicluster_correlation(struct cgn *gene,struct cbicl *bicluster, in
                                    }     
 			  }
 
-			  syy[0] = (float)sqrt(syy[0]);
+			  syy[0] = sqrt(syy[0]);
 
-			  syy[1] = (float)sqrt(syy[1]);
+			  syy[1] = sqrt(syy[1]);
 
  			  r[0] = sxy[0]/(sxx[0] * syy[0]);
 
@@ -151,6 +153,11 @@ float between_bicluster_correlation(struct cgn *gene,struct cbicl *bicluster, in
 					
 			  if(r[1]<0)
    				r[1]=0-r[1];
+
+                          if(r[0]>thr)
+                                total++; //number of correlation for combined bicluster sample
+                          if(r[1]>thr)
+                                mintotal++; //number of correlation for samples not in the combined bicluster
 
 
                           if(r[0]>thr && r[1]>thr)
@@ -166,7 +173,7 @@ float between_bicluster_correlation(struct cgn *gene,struct cbicl *bicluster, in
 
 
 /////////////////////////////////////////////////
-if (un>0)
+if (un>0 && total>mintotal)
   score=dif/un;   
 else 
   score=1.0; 

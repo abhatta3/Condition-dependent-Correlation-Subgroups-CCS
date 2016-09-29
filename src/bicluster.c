@@ -4,7 +4,7 @@
 void computebicluster(struct gn *gene, int n,int D,double thr,int k,struct bicl *maxbc, struct bicl tmpbc,char **vect)
 {
 	double jcc,mean_k,mean_i;
-	int i,j,l,vl,lc,wid[3];
+	int i,j,l,vl,lc,wid[3],l_i,t_tot,t_dif;
 	int dif,tot;
 
 	struct pair_r rval;
@@ -61,7 +61,7 @@ void computebicluster(struct gn *gene, int n,int D,double thr,int k,struct bicl 
 		{ 
 			dif=0; tot=0;
 			  
-			if(wid[vl]>=3) { //minimum 3 samples required to compute their correlation   
+			if(wid[vl]>min) { //minimum samples required to form a bicluster module. Default minimum set to 10 in ccs.h   
 
 				    rval=comput_r(vect[vl],wid[vl], k, i, D, gene);
 			}
@@ -88,30 +88,36 @@ void computebicluster(struct gn *gene, int n,int D,double thr,int k,struct bicl 
 				tmpbc.samplecount = wid[vl];
 
 
-
-
-
 				for (l = 0; l < n; l++)  { //bicluster augmentation
-
 					if (l != i && l != k) {
+                                                t_tot=0; t_dif=0;
+                                                for(l_i=0;l_i<n;l_i++) {
+                                                            if(tmpbc.data[l_i]=='1')  {
+                                                                    rval=comput_r(vect[vl],wid[vl], l, l_i, D, gene);
+                                                            
+						                    if(rval.r>thr && rval.r>rval.n_r) 
+							                       t_tot+=1;
+                                                                    else {
+                                                                               t_tot=0;
+                                                                               break;
+                                                                    }   
+                                                                    if(rval.n_r>thr) 
+								               t_dif+=1;
+                                                               }  
+                                                 }                                                                    
 
-						rval=comput_r(vect[vl],wid[vl], k, l, D, gene);
 
-						if(rval.r>thr && rval.r>rval.n_r) {
-							tot+=1;
-                                                        if(rval.n_r>thr) 
-								dif+=1;
-
-							tmpbc.data[l] = '1';
-							tmpbc.datacount++;
-                                                }
-						else {
-						      continue;
-						}
+						 if(t_tot>0 && t_tot>t_dif)  {
+                                            	            tmpbc.data[l] = '1';
+						            tmpbc.datacount++;
+                                                            tot+=t_tot; dif+=t_dif;
+                                                  }
 					}
+
+
 				}  // end of augmentation
 
-				////////////////////Compute Jaccard score//////////////////////////
+				// Compute Jaccard score
 
 				if(tot>0)
 				    jcc=dif/tot;   
@@ -119,9 +125,10 @@ void computebicluster(struct gn *gene, int n,int D,double thr,int k,struct bicl 
 				   jcc=1.0; 
 
 				/*   Select bicluster candidate as the largest (maxbc[k].datacount<tmpbc.datacount) 
-				     of all condition dependent (jaccard score <0.01) bicluster for k               */
+				     of all condition dependent (jaccard score <0.01) bicluster for k. Minimum number of gene 
+                                     for a bicluster is set at 10. See the mingene at ccs.h                                */
 
-				if(jcc<0.01 && maxbc[k].datacount<tmpbc.datacount)
+				if(jcc<0.01 && maxbc[k].datacount<tmpbc.datacount && tmpbc.datacount>mingene)
 				{
 					maxbc[k].score=jcc;
 					for (j = 0; j < n; j++)  

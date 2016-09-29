@@ -125,33 +125,66 @@ int main(int argc, char *argv[])
  	gene = (struct gn *)calloc(n,sizeof(struct gn));
  	Hd = (char **)calloc(D+1,sizeof(char *));
 
-  	for (i = 0; i < n; i++)
+  	for (i = 0; i < n; i++) {
 	    gene[i].x = (double *)calloc(D+1,sizeof(double));
+	    if (!gene[i].x) {
+		    printf("***** Memory ERROR: Can't allocate memory to read input data; Exiting \n");
+		    exit(1);
+   	    }
+         }
 
   	readgene(infile,gene,Hd,n,D);	
 
   	count=0;
 
 	bicluster = (struct bicl *)calloc(maxbcn,sizeof(struct bicl));
+        if (!bicluster) {
+		    printf("***** Memory ERROR: Can't allocate memory for biclusters; Exiting \n");
+		    exit(1);
+	}
 
         //calloc assign space to form a bicluster and initiallize them to 0
 
 	tmpbc.sample = (char *)calloc(D,sizeof(char));
 	tmpbc.data = (char *)calloc(n,sizeof(char));
+        if (!tmpbc.sample || !tmpbc.data) {
+		    printf("***** Memory ERROR: Can't allocate memory for temporary bicluster data; Exiting \n");
+		    exit(1);
+	}
+
 
 	vect=(char **)calloc(3,sizeof(char *));
 
-	for (i = 0; i < 3; i++)
+
+	for (i = 0; i < 3; i++) {
+         
 		vect[i] = (char *)calloc(D,sizeof(char));
+		if (!vect[i]) {
+			    printf("***** Memory ERROR: Can't allocate memory for sample vecotor; Exiting \n");
+			    exit(1);
+		}
+        }
+
 
   	for (i = 0; i < maxbcn; i++)
   	{
    	       bicluster[i].sample = (char *)calloc(D,sizeof(char));
  	       bicluster[i].data = (char *)calloc(n,sizeof(char));
+		if (!bicluster[i].sample || !bicluster[i].data) {
+			    printf("***** Memory ERROR: Can't allocate memory for %d thbiclusters; Exiting \n",i+1);
+			    exit(1);
+		}
+
 	       bicluster[i].samplecount=0;
     	       bicluster[i].datacount=0;
 	       computebicluster(gene,n,D,thr,i,bicluster,tmpbc,vect);
+               printf("Bicluster module for %d th base_gene completed: rows=%d,columns=%d, score=%lf...\n",i+1,bicluster[i].datacount,bicluster[i].samplecount,bicluster[i].score);
+               if (bicluster[i].score>=0.01) { //free memory if the module is not forming a valid condition dependent biclustering module
+		   free(bicluster[i].sample);
+		   free(bicluster[i].data);
+               }  
   	}
+
 
         printbicluster(out,gene,Hd,n,D,maxbcn,thr,bicluster,print_type);
   
@@ -169,11 +202,13 @@ int main(int argc, char *argv[])
 
    
 	for (i = 0; i < maxbcn; i++)
-  	{
-           free(bicluster[i].sample);
-           free(bicluster[i].data);
-           
+  	{  
+           if(bicluster[i].score<0.01) { 
+		   free(bicluster[i].sample);
+		   free(bicluster[i].data);
+           }
         }
+
         free(bicluster);
 
 	for (i = 0; i < 3; i++)

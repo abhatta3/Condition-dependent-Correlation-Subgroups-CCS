@@ -21,19 +21,18 @@
 #define mingene 10    //minimum number of genes in a bicluster 
 #define min 10        //minimum number of samples in a bicluster
 #define MAXB 1000      //maximum number of biclusters
-#define LIMIT 2500  //Maximum number of element in a bicluster
 
 
 //For CUDA 
 struct cgn{
   char id[100];
-  float x[200]; //Maximum 200 samples. If input data is larger than 150 make change this number accordingly 
+  float x[200]; //Maximum 200 samples. If input data is larger than 200 make change this number accordingly 
 };
 
 //For CUDA 
 struct cbicl{
   char sample[200];
-  char data[20000];       //maximum 20,000 genes
+  char data[20000];       //maximum 10,000 genes
   int samplecount,datacount;
   float score;
 

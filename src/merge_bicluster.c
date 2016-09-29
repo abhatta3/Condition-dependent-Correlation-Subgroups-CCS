@@ -20,6 +20,7 @@ void mergebcl(struct bicl *bicluster, int nw,int old,int n,int D,double score)
   } 
 
   bicluster[old].score=1.0; //Delete the merged bicluster
-  bicluster[nw].score=score; //update merged bicluster score 
+  bicluster[nw].score=score; //update merged bicluster score
+  printf("Bicluster %d and %d are merged. New score=%lf ...\n",nw,old,score); 
 }
 

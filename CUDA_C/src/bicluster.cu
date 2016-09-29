@@ -2,28 +2,25 @@
 
 __global__ void computebicluster_cu(struct cgn *gene, int n,int maxbcn,int D, float thr, struct cbicl *maxbc)
 {
+
    uint k=blockIdx.x*blockDim.x+threadIdx.x;
-   //uint k=threadIdx.x;	
-  
+
    if(k<maxbcn) {
 
 	float tempj,mean_k,mean_i;
 	int i,j,l,vl,lc,tc,wid[3];
 	char vect[3][200];
-	int sxc[LIMIT];  //max number of element possible in a bicluster
+	int sxc[1500];  //max number of element possible in a bicluster
 	int dif,ii;
-	float sx, sxx,	r, sy, sxy, syy, sxxb[LIMIT], sxb[LIMIT];
+	float sx, sxx,	r, sy, sxy, syy, sxxb[1500], sxb[1500];
 	float mintr, tr, tsy, tsyy, tsxy;
 	struct cbicl tmpbc;
 
 	maxbc[k].samplecount=0;
     	maxbc[k].datacount=0;
 
-
        //calculate mean expression for gene k
         mean_k=gene[k].x[D];
-      	
-
 
   	for (i = k+1; i < n; i++) //pair k,i
     	{ 	
@@ -86,7 +83,7 @@ __global__ void computebicluster_cu(struct cgn *gene, int n,int maxbcn,int D, fl
 				if(vect[vl][j]=='1')
 	      	 			sxx += (sx-gene[k].x[j]) * (sx-gene[k].x[j]);
 			}
-      			sxx = (float)sqrt(sxx);
+      			sxx = sqrt(sxx);
            
       			for (j = 0; j < D; j++) {
 				if(vect[vl][j]=='1')
@@ -104,7 +101,7 @@ __global__ void computebicluster_cu(struct cgn *gene, int n,int maxbcn,int D, fl
 				}
       			}
       
-			syy = (float)sqrt(syy);
+			syy = sqrt(syy);
    
       			r = sxy/(sxx * syy);
 
@@ -121,6 +118,7 @@ __global__ void computebicluster_cu(struct cgn *gene, int n,int maxbcn,int D, fl
 	
      		    if (r > thr) 
       		    {
+
           		for (j = 0;j < D; j++)
              			tmpbc.sample[j] = vect[vl][j];
 			for (j = 0;j < n; j++)
@@ -142,7 +140,9 @@ __global__ void computebicluster_cu(struct cgn *gene, int n,int maxbcn,int D, fl
 			
           		for (l = 0; l < n; l++)  //bicluster augmentation
           		{
-
+                                if (tmpbc.datacount>=999)
+                                     break;
+  
             			if (l != i && l != k)
             			{
               				mintr=1.0; tr = 0; tsy = 0; tsyy = 0;
@@ -156,7 +156,7 @@ __global__ void computebicluster_cu(struct cgn *gene, int n,int maxbcn,int D, fl
 						if(vect[vl][j]=='1')
 	            	   				tsyy += (tsy-gene[l].x[j]) * (tsy-gene[l].x[j]);
               				}
-              				tsyy = (float)sqrt(tsyy);
+              				tsyy = sqrt(tsyy);
 
               				for (lc = 0; lc < tmpbc.datacount; lc++)  //correlation with the genes in the bicluster[count]
               				{  
@@ -178,28 +178,28 @@ __global__ void computebicluster_cu(struct cgn *gene, int n,int maxbcn,int D, fl
              				{
                  				tmpbc.data[l] = '1';
                                                 tmpbc.datacount+=1;
-                 				sxb[lc]=tsy;  
-                 				sxxb[lc]=tsyy;
-                 				sxc[lc]=l;
+                 				sxb[tmpbc.datacount]=tsy;  
+                 				sxxb[tmpbc.datacount]=tsyy;
+                 				sxc[tmpbc.datacount]=l;
                   				
              				}         	
           			}
         		}  // end of augmentation
 
 			///////////////////////////Compute number of correlation for other samples////////////////////////
-			tc=0;
+			
 			dif=0;
+                        tc=D-wid[vl];
 			for(j=0;j<n;j++) {
 
 				if(tmpbc.data[j]=='1')
 				{
-					
 	      				sx = 0;
 	      				sxx = 0;
 		      			for (ii = 0; ii < D; ii++) {
 						if(vect[vl][ii]=='0')
 			      	 			sx +=  gene[j].x[ii];
-                                                        tc++; 
+                                     
 		  			}
                                         if (tc==0)
                                             sx=0;
@@ -209,7 +209,7 @@ __global__ void computebicluster_cu(struct cgn *gene, int n,int maxbcn,int D, fl
 						if(vect[vl][ii]=='0')
 	      			 			sxx += (sx-gene[j].x[ii]) * (sx-gene[j].x[ii]);
 					}
-		      			sxx = (double)sqrt(sxx);
+		      			sxx = sqrt(sxx);
 	
 					for(l=j+1;l<n;l++) {
 						if(tmpbc.data[l]=='1')
@@ -237,7 +237,7 @@ __global__ void computebicluster_cu(struct cgn *gene, int n,int maxbcn,int D, fl
 								}
 			      				}
 
-							syy = (double)sqrt(syy);
+							syy = sqrt(syy);
 			      				r = sxy/(sxx * syy);
 			        			if(r<0)
 			         				r=0-r;

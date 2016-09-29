@@ -115,25 +115,21 @@ int main(int argc, char *argv[])
   	}
 
 	getmatrixsize(in,&n,&D);
-	printf("Number of rows=%d\tNumber of columns=%d\n",n,D);
 
+	printf("Number of rows=%d\tNumber of columns=%d\n",n,D);
 
 	if(maxbcn>n)
 		maxbcn=n;
-
 
  	gene = (struct cgn *)calloc(n,sizeof(struct cgn));
  	Hd = (char **)calloc(D+1,sizeof(char *));
 
   	readgene(infile,gene,Hd,n,D);	
-
 	bicluster = (struct cbicl *)calloc(maxbcn,sizeof(struct cbicl));
-
 
 	cudaMalloc((void**)&device_gene, n*sizeof(struct cgn));
 	cudaMalloc((void**)&device_bicluster, maxbcn*sizeof(struct cbicl));
 	cudaMemcpy(device_gene, gene, n*sizeof(struct cgn), cudaMemcpyHostToDevice);
-
 
 	computebicluster_cu<<<maxbcn,1>>>(device_gene,n,maxbcn,D,thr,device_bicluster);
 
