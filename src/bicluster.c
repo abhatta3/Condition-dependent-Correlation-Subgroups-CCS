@@ -95,7 +95,7 @@ void computebicluster(struct gn *gene, int n,int D,double thr,int k,struct bicl 
                                                             if(tmpbc.data[l_i]=='1')  {
                                                                     rval=comput_r(vect[vl],wid[vl], l, l_i, D, gene);
                                                             
-						                    if(rval.r>thr && rval.r>rval.n_r) 
+						                    if(rval.r>thr) 
 							                       t_tot+=1;
                                                                     else {
                                                                                t_tot=0;
@@ -107,7 +107,7 @@ void computebicluster(struct gn *gene, int n,int D,double thr,int k,struct bicl 
                                                  }                                                                    
 
 
-						 if(t_tot>0 && t_tot>t_dif)  {
+						 if(t_tot>0)  {
                                             	            tmpbc.data[l] = '1';
 						            tmpbc.datacount++;
                                                             tot+=t_tot; dif+=t_dif;

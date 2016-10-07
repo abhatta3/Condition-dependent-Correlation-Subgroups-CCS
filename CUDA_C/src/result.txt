@@ -1,0 +1,6 @@
+125	59	 0.000000
+row202 row77 row61 row226 row80 row127 row18 row19 row73 row172 row113 row237 row100 row115 row22 row223 row50 row232 row177 row246 row183 row241 row102 row95 row81 row216 row153 row210 row70 row191 row169 row178 row112 row82 row83 row9 row212 row28 row65 row37 row8 row134 row230 row165 row154 row141 row35 row164 row34 row117 row47 row88 row222 row213 row220 row126 row217 row99 row182 row20 row93 row185 row161 row123 row51 row140 row14 row193 row10 row96 row181 row218 row180 row116 row229 row87 row104 row31 row137 row145 row101 row16 row179 row85 row98 row6 row119 row215 row41 row186 row231 row130 row176 row201 row74 row224 row184 row227 row142 row125 row11 row244 row157 row160 row156 row92 row128 row90 row248 row158 row219 row139 row103 row200 row195 row36 row235 row167 row175 row188 row66 row15 row149 row57 row0 
+col2 col5 col6 col7 col8 col9 col10 col11 col12 col13 col19 col21 col22 col24 col27 col28 col29 col31 col34 col36 col37 col40 col41 col42 col43 col44 col46 col48 col51 col52 col55 col56 col57 col58 col59 col61 col62 col63 col66 col68 col70 col73 col74 col76 col77 col78 col79 col80 col82 col84 col85 col87 col88 col91 col92 col93 col94 col95 col97 
+
+
+Ellapsed time= 5.799986
