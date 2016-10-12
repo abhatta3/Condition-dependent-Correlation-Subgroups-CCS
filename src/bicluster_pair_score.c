@@ -3,20 +3,17 @@
 
 double between_bicluster_correlation(struct gn *gene,struct bicl *bicluster, int nw,int old,int n,int D,double thr)
 {
-	int i,j,l;
+	int i,l;
 	double score;
 	char *g,*x;
 	struct pair_r rval;
-	int tc,dif,un,overlap=0;
+	int tc,dif,un;
 	int total=0,mintotal=0;
 
 	x = (char *)calloc(D,sizeof(char));
 	g = (char *)calloc(n,sizeof(char));
 
 	for (i=0;i<n;i++) {
-		if (bicluster[nw].data[i]=='1' && bicluster[old].data[i]=='1') 
-			overlap=1;
-
 		if (bicluster[nw].data[i]=='1' || bicluster[old].data[i]=='1') {
 			g[i]='1';
 		}
@@ -24,8 +21,6 @@ double between_bicluster_correlation(struct gn *gene,struct bicl *bicluster, int
 			g[i]='0';
 	}
 
-        if(overlap==0)
-              return(1.0);
 	tc=0;
 
 	for (i=0;i<D;i++) {
@@ -64,7 +59,7 @@ double between_bicluster_correlation(struct gn *gene,struct bicl *bicluster, int
 	}
 
 	if (un>0 && total>mintotal)
-		score=dif/un;   
+		score=(double)dif/un;   
 	else 
 		score=1.0; 
 

@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
         struct bicl *bicluster;
 	struct bicl tmpbc;
 	char **vect;
+        float overlap=100.0; 
 
 
 	 clock_t start = clock() ;
@@ -38,7 +39,7 @@ int main(int argc, char *argv[])
   	 n = D = 0;
 	 thr = errflag = 0;
   
-	 while ((c = getopt(argc, argv, "ht:m:i:p:o:?")) != -1)
+	 while ((c = getopt(argc, argv, "ht:m:i:p:o:g:?")) != -1)
   	 {
     		switch(c)
     		{
@@ -51,6 +52,11 @@ int main(int argc, char *argv[])
     			case 'm': // maximum number of bicluster search
       				maxbcn = atoi(optarg);
       				break;
+
+    			case 'g': // output file format
+      				overlap = atof(optarg);
+     				break;
+
     			case 'p': // output file format
       				print_type = atoi(optarg);
      				break;
@@ -186,7 +192,7 @@ int main(int argc, char *argv[])
   	}
 
 
-        printbicluster(out,gene,Hd,n,D,maxbcn,thr,bicluster,print_type);
+        printbicluster(out,gene,Hd,n,D,maxbcn,thr,bicluster,print_type,overlap);
   
 
   	for (i = 0; i < n; i++)
@@ -229,13 +235,14 @@ int main(int argc, char *argv[])
 
 void printUsage()
 {
-printf("\n\t\tUsage: affyAddGene\n"
+printf("\n\t\tUsage: ./ccs\n"
          "\t\t         -h [display this help message]\n"
          "\t\t         -t threshold theta in a range 0.0 - 1.0\n"
-         "\t\t         -m maximum expected biclusters in a range 1 - number_of_rows_in_input_data_matrix\n"
-         "\t\t         -i <input microarray expression file (processed data)>\n"
-         "\t\t         -p Output file format : 0 for standard format and 1 for BiBench bicluster format\n"
-         "\t\t         -o <Output file>\n"
+         "\t\t         -o output file\n"
+         "\t\t         -i input microarray expression file (processed data)\n"
+         "\t\t         -m optional parameter maximum expected biclusters in a range 1 - number_of_rows_in_input_data_matrix with a default 1000\n"
+         "\t\t         -g optional parameter minimum percentage of gene overlap between merged biclusters in a range 0-100 with a default 100 percent for full overlap\n"
+         "\t\t         -p optional output file format : 0 for standard format, 1 for BiBench bicluster format and default is 0\n"
         );
 }
 

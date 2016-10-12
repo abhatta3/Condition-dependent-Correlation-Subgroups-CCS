@@ -120,7 +120,7 @@ void computebicluster(struct gn *gene, int n,int D,double thr,int k,struct bicl 
 				// Compute Jaccard score
 
 				if(tot>0)
-				    jcc=dif/tot;   
+				    jcc=(double)dif/tot;   
 				else
 				   jcc=1.0; 
 

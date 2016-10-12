@@ -1,5 +1,6 @@
 /**************************************************************************
- * Complete Correlation Subgroups (CCS) 
+ * Condition-dependent Correlation Subgroups (CCS) 
+ * Compilation: nvcc ccs.cu -o ccs_cuda -lm
  * Description: Biclustering has been emerged as a powerful tool for 
                 identification of a group of co-expressed genes under a subset 
                 of experimental conditions (measurements) present in a gene 
@@ -23,7 +24,7 @@ respectively.
 #include "bicluster_pair_score.c"
 #include "merge_bicluster.c"
 #include "print_bicluster.c"
-
+#define MAXSAMPLE 200 //number of samples in the input datamatrix. Fixed here to make static shared memory in global and device function. They dynamic alternative is commented out.
 
 
 __device__  struct pair_r comput_r_cuda(char *sample,int wid,int k,int i,int D,float **gene)
@@ -32,6 +33,9 @@ __device__  struct pair_r comput_r_cuda(char *sample,int wid,int k,int i,int D,f
 	float sx, sxx, sy, sxy, syy;
 	float sx_n, sxx_n, sy_n, sxy_n, syy_n;
 	int j;
+        __shared__ float genekj[MAXSAMPLE];
+       __shared__ float geneij[MAXSAMPLE];
+  
         struct pair_r rval;
 
         rval.r=0.0;
@@ -42,10 +46,11 @@ __device__  struct pair_r comput_r_cuda(char *sample,int wid,int k,int i,int D,f
 	sx_n = 0; sxx_n = 0;  sy_n = 0;	sxy_n = 0; syy_n = 0;
 
 	for (j = 0; j < D; j++) {
+                genekj[j]=gene[k][j];
 		if(sample[j]=='1')
-			sx +=  gene[k][j];
+			sx +=  genekj[j];
 		else
-		        sx_n +=  gene[k][j];
+		        sx_n +=  genekj[j];
 	}
 	sx /= wid;
 
@@ -53,19 +58,21 @@ __device__  struct pair_r comput_r_cuda(char *sample,int wid,int k,int i,int D,f
 
 	for (j = 0; j < D; j++) {
 		if(sample[j]=='1')
-			sxx += (sx-gene[k][j]) * (sx-gene[k][j]);
+			sxx += (sx-genekj[j]) * (sx-genekj[j]);
 		else
-			sxx_n += (sx_n-gene[k][j]) * (sx_n-gene[k][j]);
+			sxx_n += (sx_n-genekj[j]) * (sx_n-genekj[j]);
 
 	}
+
 	sxx = (float)sqrt(sxx);
 	sxx_n = (float)sqrt(sxx_n);
 
 	for (j = 0; j < D; j++) {
+                geneij[j]=gene[i][j];
 		if(sample[j]=='1')
-			sy +=  gene[i][j];
+			sy +=  geneij[j];
 		else
-			sy_n +=  gene[i][j];
+			sy_n +=  geneij[j];
 	}
 
 	sy /= wid; 
@@ -77,13 +84,13 @@ __device__  struct pair_r comput_r_cuda(char *sample,int wid,int k,int i,int D,f
 
 		if(sample[j]=='1') {
 
-			sxy += (sx - gene[k][j]) * (sy - gene[i][j]);
-			syy += (sy - gene[i][j]) * (sy - gene[i][j]);
+			sxy += (sx - genekj[j]) * (sy - geneij[j]);
+			syy += (sy - geneij[j]) * (sy - geneij[j]);
 		}
 		else {
 
-			sxy_n += (sx_n - gene[k][j]) * (sy_n - gene[i][j]);
-			syy_n += (sy_n - gene[i][j]) * (sy_n - gene[i][j]);
+			sxy_n += (sx_n - genekj[j]) * (sy_n - geneij[j]);
+			syy_n += (sy_n - geneij[j]) * (sy_n - geneij[j]);
 		}
 
 	}
@@ -102,24 +109,28 @@ __device__  struct pair_r comput_r_cuda(char *sample,int wid,int k,int i,int D,f
 
 
 
-__global__ void computebicluster_cu(float **gene, int n,int maxbcn,int D, float thr, char **maxbc_sample,char **maxbc_data,float *maxbc_score,int *maxbc_datacount, int *maxbc_samplecount, char **tmpbc_sample,char **tmpbc_data,float *tmpbc_score,int *tmpbc_datacount, int *tmpbc_samplecount)
+__global__ void computebicluster_cu(float **gene, int n,int maxbcn,int D, float thr, char **maxbc_sample,char **maxbc_data,float *maxbc_score,int *maxbc_datacount, int *maxbc_samplecount, char **tmpbc_sample,char **tmpbc_data)
 {
 
    int k=blockIdx.x*blockDim.x+threadIdx.x;
 
    if(k<maxbcn) {
-                
+
+                //extern __shared__ char arr[];
 
 		float jcc,mean_k,mean_i;
-		int i,j,l,vl,wid[3],l_i,t_tot,t_dif;
+		int i,j,l,vl,wid,wid_0,wid_1,wid_2,l_i,t_tot,t_dif;
 		int dif,tot;
-		char *vect[3];
-                 
+		//char *vect[3];
+		__shared__  char vect[3][MAXSAMPLE];
 		struct pair_r rval;
-              
-                for(i=0;i<3;i++)
-                        vect[i]=(char *)malloc(D*sizeof(char));
-               
+                int tmpbc_datacount,tmpbc_samplecount;
+
+                float genekj,geneij;
+
+                //for(i=0;i<3;i++)
+                    //vect[i]=&arr[i*D];
+
 		maxbc_score[k]=1.0;
 		maxbc_datacount[k]=0;  
 
@@ -133,36 +144,38 @@ __global__ void computebicluster_cu(float **gene, int n,int maxbcn,int D, float 
 			//calculate mean expression for gene i
 			mean_i=gene[i][D];
 
-			wid[0]=0; wid[1]=0; wid[2]=0;      
+			wid_0=0; wid_1=0; wid_2=0;      
 
 			for (j = 0; j < D; j++)  
 			{
+                                genekj=gene[k][j];
+                                geneij=gene[i][j];
 
-				if ((gene[k][j] - mean_k)>=0 && (gene[i][j] - mean_i)>=0) //i and k upregulated : positive correlation
+				if ((genekj - mean_k)>=0 && (geneij - mean_i)>=0) //i and k upregulated : positive correlation
 				{
 
 					vect[0][j] = '1';
 					vect[1][j] = '0';
 					vect[2][j] = '0';
 
-					wid[0]+=1;
+					wid_0+=1;
 				}
-				else if ((gene[k][j] - mean_k)<0 && (gene[i][j] - mean_i)<0)  // i and k down regulated : positive correlation
+				else if ((genekj - mean_k)<0 && (geneij - mean_i)<0)  // i and k down regulated : positive correlation
 				{
 
 					vect[0][j] = '0';
 					vect[1][j] = '1';
 					vect[2][j] = '0';
 
-					wid[1]+=1;
+					wid_1+=1;
 				}
-				else if ((gene[k][j] - mean_k)*(gene[i][j] - mean_i)<0) //betwenn i and k one is up regulated and the other one is down regulated : negative correlation
+				else if ((genekj - mean_k)*(geneij - mean_i)<0) //betwenn i and k one is up regulated and the other one is down regulated : negative correlation
 				{
 
 					vect[0][j] = '0';
 					vect[1][j] = '0';
 					vect[2][j] = '1';
-					wid[2]+=1;
+					wid_2+=1;
 
 				} 
 
@@ -171,10 +184,17 @@ __global__ void computebicluster_cu(float **gene, int n,int maxbcn,int D, float 
 			for (vl = 0; vl < 3; vl++)
 			{ 
 				dif=0; tot=0;
-				  
-				if(wid[vl]>min) { //minimum samples required to form a bicluster module. Default minimum set to 10 in ccs.h   
+                                if(vl==0)
+                                    wid=wid_0; 
+                                else if(vl==1)
+                                    wid=wid_1; 
+                                if(vl==2)
+                                    wid=wid_2; 
 
-					    rval=comput_r_cuda(vect[vl],wid[vl], k, i, D, gene);
+				  
+				if(wid>min) { //minimum samples required to form a bicluster module. Default minimum set to 10 in ccs.h   
+
+					    rval=comput_r_cuda(vect[vl],wid, k, i, D, gene);
 				}
 				else {
 
@@ -195,8 +215,8 @@ __global__ void computebicluster_cu(float **gene, int n,int maxbcn,int D, float 
 
 					tmpbc_data[k][k] = '1';
 					tmpbc_data[k][i] = '1';
-					tmpbc_datacount[k] = 2;
-					tmpbc_samplecount[k] = wid[vl];
+					tmpbc_datacount = 2;
+					tmpbc_samplecount = wid;
 
 
 					for (l = 0; l < n; l++)  { //bicluster augmentation
@@ -204,7 +224,7 @@ __global__ void computebicluster_cu(float **gene, int n,int maxbcn,int D, float 
 		                                        t_tot=0; t_dif=0;
 		                                        for(l_i=0;l_i<n;l_i++) {
 		                                                    if(tmpbc_data[k][l_i]=='1')  {
-		                                                            rval=comput_r_cuda(vect[vl],wid[vl], l, l_i, D, gene);
+		                                                            rval=comput_r_cuda(vect[vl],wid, l, l_i, D, gene);
 		                                                    
 								            if(rval.r>thr) 
 									               t_tot+=1;
@@ -220,7 +240,7 @@ __global__ void computebicluster_cu(float **gene, int n,int maxbcn,int D, float 
 
 							 if(t_tot>0)  {
 		                                    	            tmpbc_data[k][l] = '1';
-								    tmpbc_datacount[k]+=1;
+								    tmpbc_datacount+=1;
 		                                                    tot+=t_tot; dif+=t_dif;
 		                                          }
 						}
@@ -231,7 +251,7 @@ __global__ void computebicluster_cu(float **gene, int n,int maxbcn,int D, float 
 					// Compute Jaccard score
 
 					if(tot>0)
-					    jcc=dif/tot;   
+					    jcc=(float)dif/tot;   
 					else
 					   jcc=1.0; 
 
@@ -239,24 +259,25 @@ __global__ void computebicluster_cu(float **gene, int n,int maxbcn,int D, float 
 					     of all condition dependent (jaccard score <0.01) bicluster for k. Minimum number of gene 
 		                             for a bicluster is set at 10. See the mingene at ccs.h                                */
 
-					if(jcc<0.01 && maxbc_datacount[k]<tmpbc_datacount[k] && tmpbc_datacount[k]>mingene)
+					if(jcc<0.01 && maxbc_datacount[k]<tmpbc_datacount && tmpbc_datacount>mingene)
 					{
 						maxbc_score[k]=jcc;
 						for (j = 0; j < n; j++)  
 					       		maxbc_data[k][j]=tmpbc_data[k][j];
 						for (j = 0; j < D; j++)  
 					   		maxbc_sample[k][j]=tmpbc_sample[k][j];
-						maxbc_datacount[k]=tmpbc_datacount[k];
-						maxbc_samplecount[k]=tmpbc_samplecount[k];
+						maxbc_datacount[k]=tmpbc_datacount;
+						maxbc_samplecount[k]=tmpbc_samplecount;
 
 					 }
+
 
 				}    //end of r>thr condition
 			}    //end of loop for vl	
 
 		}  // end of i loop
-         for(i=0;i<3;i++)
-              free(vect[i]);
+         //for(i=0;i<3;i++)
+              //free(vect[i]);
 
 	}
 }
@@ -275,6 +296,7 @@ int main(int argc, char *argv[])
 	extern char *optarg;
 	float thr,**device_gene,**device_gene_temp;
         struct bicl *bicluster;
+        float overlap=100.0; 
 
         char **device_bicluster_sample,**device_bicluster_temp_sample,**device_bicluster_data,**device_bicluster_temp_data;
         float *device_bicluster_score,*device_bicluster_temp_score;
@@ -283,10 +305,7 @@ int main(int argc, char *argv[])
         int *device_bicluster_samplecount,*device_bicluster_temp_samplecount;
 
         char **device_bicluster_sample_tmpbc,**device_bicluster_temp_sample_tmpbc,**device_bicluster_data_tmpbc,**device_bicluster_temp_data_tmpbc;
-        float *device_bicluster_score_tmpbc,*device_bicluster_temp_score_tmpbc;
 
-        int *device_bicluster_datacount_tmpbc;
-        int *device_bicluster_samplecount_tmpbc;
 
 
 	clock_t start = clock() ;
@@ -295,7 +314,7 @@ int main(int argc, char *argv[])
   	n = D = 0;
 	thr = errflag = 0;
   
-	while ((c = getopt(argc, argv, "ht:m:i:p:o:?")) != -1)
+	while ((c = getopt(argc, argv, "ht:m:i:p:o:g:?")) != -1)
   	{
     		switch(c)
     		{
@@ -308,6 +327,11 @@ int main(int argc, char *argv[])
     			case 'm': // maximum number of bicluster search
       				maxbcn = atoi(optarg);
       				break;
+
+    			case 'g': // output file format
+      				overlap = atof(optarg);
+     				break;
+
     			case 'p': // output file format
       				print_type = atoi(optarg);
      				break;
@@ -431,15 +455,6 @@ int main(int argc, char *argv[])
         cudaMalloc((void **)&device_bicluster_data_tmpbc, maxbcn*sizeof(char *));
         device_bicluster_temp_data_tmpbc = (char **)calloc(maxbcn,sizeof(char *));
 
-        cudaMalloc((void **)&device_bicluster_score_tmpbc, maxbcn*sizeof(float));
-        device_bicluster_temp_score_tmpbc = (float *)calloc(maxbcn,sizeof(float));
-
-
-        cudaMalloc((void **)&device_bicluster_datacount_tmpbc, maxbcn*sizeof(int));
-
-        cudaMalloc((void **)&device_bicluster_samplecount_tmpbc, maxbcn*sizeof(int));
-
-
 
 
         if (!bicluster) {
@@ -478,11 +493,12 @@ int main(int argc, char *argv[])
 
         cudaMemcpy(device_bicluster_data_tmpbc, device_bicluster_temp_data_tmpbc, maxbcn*sizeof(char *), cudaMemcpyHostToDevice);
 
+        //int sherememsize=(3*D)*(sizeof(char)); 
 
-        computebicluster_cu<<<maxbcn,1>>>(device_gene,n,maxbcn,D,thr,device_bicluster_sample,device_bicluster_data,device_bicluster_score,device_bicluster_datacount,device_bicluster_samplecount, device_bicluster_sample_tmpbc,device_bicluster_data_tmpbc,device_bicluster_score_tmpbc,device_bicluster_datacount_tmpbc,device_bicluster_samplecount_tmpbc);
+        //computebicluster_cu<<<maxbcn,1,sherememsize>>>(device_gene,n,maxbcn,D,thr,device_bicluster_sample,device_bicluster_data,device_bicluster_score,device_bicluster_datacount,device_bicluster_samplecount, device_bicluster_sample_tmpbc,device_bicluster_data_tmpbc);
 
 
- 
+        computebicluster_cu<<<maxbcn,1>>>(device_gene,n,maxbcn,D,thr,device_bicluster_sample,device_bicluster_data,device_bicluster_score,device_bicluster_datacount,device_bicluster_samplecount, device_bicluster_sample_tmpbc,device_bicluster_data_tmpbc);
 
         cudaMemcpy(device_bicluster_temp_score, device_bicluster_score, maxbcn*sizeof(float), cudaMemcpyDeviceToHost);
         cudaMemcpy(device_bicluster_temp_datacount, device_bicluster_datacount, maxbcn*sizeof(int), cudaMemcpyDeviceToHost);
@@ -503,7 +519,7 @@ int main(int argc, char *argv[])
 
 
 
-        printbicluster(out,gene,Hd,n,D,maxbcn,thr,bicluster,print_type);
+        printbicluster(out,gene,Hd,n,D,maxbcn,thr,bicluster,print_type,overlap);
 
 
 
@@ -545,9 +561,7 @@ int main(int argc, char *argv[])
 
 	cudaFree(device_bicluster_sample_tmpbc);
         cudaFree(device_bicluster_data_tmpbc);
-        cudaFree(device_bicluster_score_tmpbc);
-        cudaFree(device_bicluster_datacount_tmpbc);
-        cudaFree(device_bicluster_samplecount_tmpbc);
+
 
 
 	free(device_bicluster_temp_data);
@@ -556,15 +570,13 @@ int main(int argc, char *argv[])
 
 	free(device_bicluster_temp_data_tmpbc);
 	free(device_bicluster_temp_sample_tmpbc);
-	free(device_bicluster_temp_score_tmpbc);
-
 
         free(bicluster);
 
 
 
  	clock_t end = clock() ;
- 	 float elapsed_time = (end-start)/( float)CLOCKS_PER_SEC ;
+ 	float elapsed_time = (end-start)/( float)CLOCKS_PER_SEC ;
  	printf("Ellapsed time= %f\n",elapsed_time);
         if(print_type==0)     
         	fprintf(out,"\n\nEllapsed time= %f\n",elapsed_time);
@@ -576,13 +588,14 @@ int main(int argc, char *argv[])
 
 void printUsage()
 {
-printf("\n\t\tUsage: affyAddGene\n"
+printf("\n\t\tUsage: ./ccs_cuda\n"
          "\t\t         -h [display this help message]\n"
          "\t\t         -t threshold theta in a range 0.0 - 1.0\n"
-         "\t\t         -m maximum expected biclusters in a range 1 - number_of_rows_in_input_data_matrix\n"
-         "\t\t         -i <input microarray expression file (processed data)>\n"
-         "\t\t         -p Output file format : 0 for standard format and 1 for BiBench bicluster format\n"
-         "\t\t         -o <Output file>\n"
+         "\t\t         -o output file\n"
+         "\t\t         -i input microarray expression file (processed data)\n"
+         "\t\t         -m optional parameter maximum expected biclusters in a range 1 - number_of_rows_in_input_data_matrix with a default 1000\n"
+         "\t\t         -g optional parameter minimum percentage of gene overlap between merged biclusters in a range 0-100 with a default 100 percent for full overlap\n"
+         "\t\t         -p optional output file format : 0 for standard format, 1 for BiBench bicluster format and default is 0\n"
         );
 }
 

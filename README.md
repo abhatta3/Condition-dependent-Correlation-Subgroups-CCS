@@ -32,9 +32,7 @@ You need a programmable GPU card and CUDA C complier for compilation and executi
 The performance of CCS was compared on synthetic and real gene expression datasets. We also showed that there is an equivalence between CCS biclusters and condition-dependent co-expression network modules. These codes are implemented in Python 2 and work on Python 2.7 or higher. They are made available in "python_utility" directory. 
 
 
-Synthetic datasets, CCS results and true biclusters are available in "Data" directory.
- 
-CCS biclustering results on gene expression datasets and the datasets are available from "Results" directory.
+Synthetic datasets, CCS results, true biclusters, CCS biclustering results on gene expression datasets and the datasets are available in "Results" directory.
 
 
 
@@ -81,6 +79,15 @@ Example:
 $./ccsbc -t 0.8 -i ./Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.txt -m 50
 
 
+
+-g [0.0 - 100.0]: Minimum gene set overlap required for merging the overlapped biclusters. 
+ 		  Default value is 100.0 for 100% overlap. 
+
+Example: 
+
+$./ccsbc -t 0.8 -i ./Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.txt -g 50.0
+
+
 -p [0/1]: Set the output format.
           Default is 0.
 	  0 - Print output in 3 rows. 
@@ -95,9 +102,9 @@ $./ccsbc -t 0.8 -i ./Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.
 
 Example: 
 
-1. $./ccsbc -t 0.8 -i ./Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./TempResults/Output_standard.txt -m 50 -p 0
+1. $./ccsbc -t 0.8 -i ./Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output_standard.txt -m 50 -p 0
 
-2. $./ccsbc -t 0.8 -i ./Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./TempResults/Output_bibench.txt -m 50 -p 1
+2. $./ccsbc -t 0.8 -i ./Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output_bibench.txt -m 50 -p 1
 
 See your results at "TempResults"
 
