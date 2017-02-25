@@ -19,6 +19,6 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-$(EXEDIR)ccsbc: $(OBJ)
+$(EXEDIR)ccs: $(OBJ)
 	gcc -o $@ $^ $(CFLAGS) $(LIBS)
 
