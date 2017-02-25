@@ -57,7 +57,7 @@ B. Execute C code
 
 Type following in the linux command line
 
-	./ccsbc -t [correlation threshold] -i [input file] -o [output file]
+	./ccs -t [correlation threshold] -i [input file] -o [output file]
 
 Parameters:
 
@@ -67,7 +67,7 @@ Parameters:
 
 
 Example: 
-	./ccsbc -t 0.8 -i ./Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.txt
+	./ccs -t 0.8 -i ./Results/Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.txt
 
 
 Additional parameters:
@@ -75,13 +75,13 @@ Additional parameters:
 -m [1 - number of gene/rows in the data matrix]: Set the number of base gene that are to be considered for forming biclusters. Default value is 1000 or maximum number of genes when that is less than 1000. 
 
 Example: 
-	./ccsbc -t 0.8 -i ./Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.txt -m 90
+	./ccs -t 0.8 -i ./Results/Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.txt -m 90
 
 
 -g [0.0 - 100.0]: Minimum gene set overlap required for merging the overlapped biclusters. Default value is 100.0 for 100% overlap. 
 
 Example: 
-	./ccsbc -t 0.8 -i ./Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.txt -g 50.0
+	./ccs -t 0.8 -i ./Results/Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output.txt -g 50.0
 
 
 -p [0/1]: Set the output format. Default is 0.
@@ -99,7 +99,7 @@ Example:
 
 
 Example: 
-	./ccsbc -t 0.9 -i ./Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output_standard.txt -m 50 -p 1 -g 100.0
+	./ccs -t 0.9 -i ./Results/Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output_standard.txt -m 50 -p 1 -g 100.0
 
 
 C. Compilation of CUDA C code
