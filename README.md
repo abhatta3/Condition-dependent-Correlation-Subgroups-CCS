@@ -1,38 +1,25 @@
-####################################################################################################
-###      Condition-dependent Correlation Subgroup (CCS)                                          ###
-###----------------------------------------------------------------------------------------------###
-###                                                                                              ###
-### This file is part of the CCS package for biclustering analysis                               ###
-###                                                                                              ###
-###----------------------------------------------------------------------------------------------###
+Condition-dependent Correlation Subgroup (CCS)
+[This file is part of the CCS package for biclustering analysis]
 
-
-=======================
 Introduction to CCS
-=======================
-
+------------------------
 Condition-dependent Correlation Subgroup (CCS) is a biclustering algorithm for comprehensive discovery of functionally coherent biclusters from large-scale gene expression data. For the details of the CCS algorithm, see our paper entitled “A GPU-accelerated algorithm for biclustering analysis and detection of condition-dependent coexpression network modules”. The algorithm is implemented in C. See the steps in the section A and B for compilation and execution of the C code.
 The structure of the CCS algorithm is particularly suitable for parallel computing. A CUDA C based GPGPU computing code is included here as a parallel version of the algorithm. You need a programmable GPU card and CUDA C complier for compilation and execution of our code. Follow the steps in C and D.
 The performance of CCS was tested on synthetic and real gene expression datasets. We also showed that there is an equivalence between CCS biclusters and condition-dependent co-expression network modules. The related Python codes (Python 2.7 or higher) are available in the "python_utility" directory.
 Synthetic and real gene expression datasets, and CCS biclustering results are available in the "Results" directory.
 
 
-
-============================
 Installation and Execution
-============================
-
+--------------------------
 
 A. Compilation of C code
-====================================
-
+------------------------
 1.	Change your current directory to "src". $cd src
 2.	Type "make" to create executable "ccsbc" in the home directory $make
 3.	Back to parent directory cd ../
 
 B. Execute C code
-====================================
-
+-----------------
 Type the following commands in Linux:
 ./ccs -t [correlation threshold] -i [input file] -o [output file]
 Parameters:
@@ -62,35 +49,28 @@ Example:
 ./ccs -t 0.9 -i ./Results/Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Results/Output_standard.txt -m 50 -p 1 -g 100.0
 
 C. Compilation of CUDA C code
-====================================
-Note that a CUDA supported GPU card and CUDA C compiler is required.
+------------------------------
+*Note that a CUDA supported GPU card and CUDA C compiler is required.
 1.	Change your current directory to "CUDA_C". $cd CUDA_C
 2.	Type following in the linux command line $nvcc ./src/ccs.cu -lm -o ccs_cuda
 
 D. Execute CUDA C code
-====================================
-
+-----------------------
 Type following commands in the Linux: 
 ./ccs_cuda -t [correlation threshold] -i [input file] -o [output file]
 Example: 
 ./ccs_cuda -t 0.9 -i ../Synthetic_data_results/Data/Data_Constant_100_1_bicluster.txt -o ./Output.txt -m 50 -p 1 -g 100.0
 
 
-====================================
 Authors
-====================================
-
+-------------------------------------------------
 •	Anindya Bhattacharya, anindyamail123@gmail.com
 •	Yan Cui, ycui2@uthsc.edu
 
-====================================
 Contact
-====================================
-
+-------------
 If you have comments or questions, or if you would like to contribute to the further development of CCS, please send us an email at anindyamail123@gmail.com and ycui2@uthsc.edu
 
-====================================
 License
-====================================
-
+------------
 This projected is licensed under the terms of the GNU General Public License v3.0.
