@@ -1,5 +1,7 @@
-Condition-dependent Correlation Subgroup (CCS)
-[This file is part of the CCS package for biclustering analysis]
+*This file is part of the CCS package for biclustering analysis
+
+Name: Condition-dependent Correlation Subgroup (CCS)
+-----------------------------------------------------
 
 Introduction to CCS
 ------------------------
