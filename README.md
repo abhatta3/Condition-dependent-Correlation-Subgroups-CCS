@@ -1,3 +1,8 @@
+Publication link
+————————————————
+https://www.nature.com/articles/s41598-017-04070-4
+
+
 *This file is part of the CCS package for biclustering analysis
 
 Name: Condition-dependent Correlation Subgroup (CCS)
